@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table()
  * @ORM\Entity
  */
-class User {
+class User implements \Symfony\Component\Security\Core\User\UserInterface, \Serializable {
 
     /**
      * @var integer
@@ -169,14 +169,6 @@ class User {
         return $this;
     }
 
-    function getPlainPassword() {
-        return $this->plainPassword;
-    }
-
-    function setPlainPassword($plainPassword) {
-        $this->plainPassword = $plainPassword;
-    }
-
     /**
      * Get profilePic
      *
@@ -186,4 +178,51 @@ class User {
         return $this->profilePic;
     }
 
+    function getPlainPassword() {
+        return $this->plainPassword;
+    }
+
+    function setPlainPassword($plainPassword) {
+        $this->plainPassword = $plainPassword;
+    }
+
+    public function eraseCredentials() {
+        
+    }
+
+    public function getPassword() {
+        return $this->plainPassword;
+    }
+
+    public function getRoles() {
+        return array('ROLE_USER');
+    }
+
+    public function getSalt() {
+        return null;
+    }
+
+    public function getUsername() {
+        return $this->email;
+    }
+
+    public function serialize() {
+        return serialize(array(
+            $this->id,
+            $this->email,
+            $this->plainPassword,
+            // see section on salt below
+            // $this->salt,
+        ));
+    }
+
+    public function unserialize($serialized) {
+        list (
+            $this->id,
+            $this->email,
+            $this->plainPassword,
+            // see section on salt below
+            // $this->salt
+        ) = unserialize($serialized);
+    }
 }
